@@ -1,0 +1,19 @@
+@Korp.Stock.Api_HostAddress = https://localhost:7200
+
+### Create Product
+POST {{Korp.Stock.Api_HostAddress}}/api/products
+Content-Type: application/json
+
+{
+  "code": "",
+  "description": "",
+  "stockQuantity": -5
+}
+
+### Get All Products
+GET {{Korp.Stock.Api_HostAddress}}/api/products
+Accept: application/json
+
+### Get Product By Id
+GET {{Korp.Stock.Api_HostAddress}}/api/products/COLE-AQUI-UM-GUID-VALIDO
+Accept: application/json
