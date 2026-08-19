@@ -7,8 +7,8 @@ Content-Type: application/json
 {
   "items": [
     {
-      "productId": "COLE-AQUI-UM-GUID-REAL",
-      "quantity": 2
+      "productId": "c93e275e-423f-4c41-91c1-eb92b983a9bb",
+      "quantity": 999
     }
   ]
 }
@@ -18,5 +18,8 @@ GET {{Korp.Billing.Api_HostAddress}}/api/invoices
 Accept: application/json
 
 ### Get Invoice By Id
-GET {{Korp.Billing.Api_HostAddress}}/api/invoices/27dd0c33-df81-45c0-a997-004e2c50edf1
+GET {{Korp.Billing.Api_HostAddress}}/api/invoices/566f4638-8945-467e-889e-61587418a818
 Accept: application/json
+
+### Print Invoice
+POST {{Korp.Billing.Api_HostAddress}}/api/invoices/566f4638-8945-467e-889e-61587418a818/print

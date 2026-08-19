@@ -17,3 +17,17 @@ Accept: application/json
 ### Get Product By Id
 GET {{Korp.Stock.Api_HostAddress}}/api/products/"COLE-AQUI-UM-GUID-REAL"
 Accept: application/json
+
+### Debit Stock
+POST {{Korp.Stock.Api_HostAddress}}/api/stock/debit
+Content-Type: application/json
+
+{
+  "invoiceId": "11111111-1111-1111-1111-111111111111",
+  "items": [
+    {
+      "productId": "COLE-UM-PRODUCT-ID-REAL",
+      "quantity": 2
+    }
+  ]
+}

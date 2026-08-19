@@ -3,6 +3,7 @@ using Korp.Billing.Api.Common.Exceptions;
 using Korp.Billing.Api.Features.Invoices.Create;
 using Korp.Billing.Api.Features.Invoices.GetAll;
 using Korp.Billing.Api.Features.Invoices.GetById;
+using Korp.Billing.Api.Features.Invoices.Print;
 using Korp.Billing.Api.Infrastructure.Clients.Stock;
 using Korp.Billing.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +39,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateInvoiceValidator>();
 builder.Services.AddScoped<CreateInvoiceHandler>();
 builder.Services.AddScoped<GetAllInvoicesHandler>();
 builder.Services.AddScoped<GetInvoiceByIdHandler>();
+builder.Services.AddScoped<PrintInvoiceHandler>();
 
 builder.Services.AddOpenApi();
 

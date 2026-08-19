@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using Korp.Billing.Api.Common.Exceptions;
+using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Korp.Billing.Api.Infrastructure.Clients.Stock
 {
@@ -13,6 +15,46 @@ namespace Korp.Billing.Api.Infrastructure.Clients.Stock
         {
             _httpClient = httpClient;
             _logger = logger;
+        }
+
+        public async Task<DebitStockResponse> DebitStockAsync(DebitStockRequest request, CancellationToken cancellationToken = default)
+        {
+            var response = await _httpClient.PostAsJsonAsync(
+        "api/stock/debit",
+        request,
+        cancellationToken);
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                var problemDetails = await response.Content
+                    .ReadFromJsonAsync<ProblemDetails>(
+                        cancellationToken: cancellationToken);
+
+                throw new NotFoundException(
+                    problemDetails?.Detail
+                    ?? "A product required by the invoice was not found.");
+            }
+
+            if (response.StatusCode == HttpStatusCode.Conflict)
+            {
+                var problemDetails = await response.Content
+                    .ReadFromJsonAsync<ProblemDetails>(
+                        cancellationToken: cancellationToken);
+
+                throw new ConflictException(
+                    problemDetails?.Detail
+                    ?? "Stock could not be debited.");
+            }
+
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content
+                .ReadFromJsonAsync<DebitStockResponse>(
+                    cancellationToken: cancellationToken);
+
+            return result
+                ?? throw new InvalidOperationException(
+                    "Stock service returned an empty response.");
         }
 
         public async Task<StockProductResponse?> GetProductByIdAsync(
