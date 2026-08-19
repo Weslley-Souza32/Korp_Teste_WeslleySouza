@@ -8,5 +8,6 @@
         public int StockQuantity { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
+        public uint Version { get; set; }
     }
 }

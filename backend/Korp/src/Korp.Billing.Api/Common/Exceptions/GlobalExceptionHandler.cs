@@ -57,6 +57,13 @@ namespace Korp.Billing.Api.Common.Exceptions
                     Detail = exception.Message
                 },
 
+                ServiceUnavailableException => new ProblemDetails
+                {
+                    Status = StatusCodes.Status503ServiceUnavailable,
+                    Title = "Service unavailable",
+                    Detail = exception.Message
+                },
+
                 _ => new ProblemDetails
                 {
                     Status = StatusCodes.Status500InternalServerError,

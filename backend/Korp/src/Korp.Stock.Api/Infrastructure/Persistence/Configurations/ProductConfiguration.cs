@@ -39,6 +39,9 @@ namespace Korp.Stock.Api.Infrastructure.Persistence.Configurations
             builder.Property(product => product.UpdatedAt)
                 .HasColumnName("updated_at")
                 .IsRequired();
+
+            builder.Property(product => product.Version)
+                .IsRowVersion();
         }
     }
 }

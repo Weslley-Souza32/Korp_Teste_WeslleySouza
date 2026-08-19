@@ -1,4 +1,5 @@
 ﻿using Korp.Stock.Api.Common.Exceptions;
+using Korp.Stock.Api.Domain.Entities;
 using Korp.Stock.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,9 +14,26 @@ namespace Korp.Stock.Api.Features.Stock.Debit
             _dbContext = dbContext;
         }
 
-        public async Task<DebitStockResponse> HandleAsync(DebitStockRequest request, CancellationToken cancellationToken = default)
+        public async Task<DebitStockResponse> HandleAsync(
+            DebitStockRequest request,
+            CancellationToken cancellationToken = default)
         {
-            await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+            await using var transaction =
+                await _dbContext.Database.BeginTransactionAsync(
+                    cancellationToken);
+
+            var alreadyProcessed = await _dbContext.StockDebitOperations
+                .AnyAsync(
+                    operation => operation.InvoiceId == request.InvoiceId,
+                    cancellationToken);
+
+            if (alreadyProcessed)
+            {
+                return new DebitStockResponse
+                {
+                    Success = true
+                };
+            }
 
             var productIds = request.Items
                 .Select(item => item.ProductId)
@@ -52,9 +70,26 @@ namespace Korp.Stock.Api.Features.Stock.Debit
                 product.UpdatedAt = DateTimeOffset.UtcNow;
             }
 
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            var debitOperation = new StockDebitOperation
+            {
+                Id = Guid.NewGuid(),
+                InvoiceId = request.InvoiceId,
+                ProcessedAt = DateTimeOffset.UtcNow
+            };
 
-            await transaction.CommitAsync(cancellationToken);
+            _dbContext.StockDebitOperations.Add(debitOperation);
+
+            try
+            {
+                await _dbContext.SaveChangesAsync(cancellationToken);
+
+                await transaction.CommitAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+
+                throw new ConflictException("Stock was changed by another operation. Please try again.");
+            }
 
             return new DebitStockResponse
             {

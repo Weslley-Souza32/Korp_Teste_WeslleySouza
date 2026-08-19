@@ -5,9 +5,9 @@ POST {{Korp.Stock.Api_HostAddress}}/api/products
 Content-Type: application/json
 
 {
-  "code": "",
-  "description": "",
-  "stockQuantity": -5
+  "code": "PROD-CONC-001",
+  "description": "Produto Teste Concorrencia",
+  "stockQuantity": 1
 }
 
 ### Get All Products
@@ -28,6 +28,48 @@ Content-Type: application/json
     {
       "productId": "COLE-UM-PRODUCT-ID-REAL",
       "quantity": 2
+    }
+  ]
+}
+
+### Debit Stock - Idempotency
+POST {{Korp.Stock.Api_HostAddress}}/api/stock/debit
+Content-Type: application/json
+
+{
+  "invoiceId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+  "items": [
+    {
+      "productId": "b9db4521-4e53-4ded-8370-4745871117b8",
+      "quantity": 2
+    }
+  ]
+}
+
+### Concurrency A
+POST {{Korp.Stock.Api_HostAddress}}/api/stock/debit
+Content-Type: application/json
+
+{
+  "invoiceId": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+  "items": [
+    {
+      "productId": "b6c10e89-c773-4b6f-afb4-e5273804a3b0",
+      "quantity": 11
+    }
+  ]
+}
+
+### Concurrency B
+POST {{Korp.Stock.Api_HostAddress}}/api/stock/debit
+Content-Type: application/json
+
+{
+  "invoiceId": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+  "items": [
+    {
+      "productId": "b6c10e89-c773-4b6f-afb4-e5273804a3b0",
+      "quantity": 11
     }
   ]
 }

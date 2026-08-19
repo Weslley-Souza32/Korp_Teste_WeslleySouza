@@ -1,6 +1,7 @@
-﻿using Korp.Billing.Api.Common.Exceptions;
+﻿using System.Net;
+using System.Net.Http.Json;
+using Korp.Billing.Api.Common.Exceptions;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace Korp.Billing.Api.Infrastructure.Clients.Stock
 {
@@ -17,12 +18,78 @@ namespace Korp.Billing.Api.Infrastructure.Clients.Stock
             _logger = logger;
         }
 
-        public async Task<DebitStockResponse> DebitStockAsync(DebitStockRequest request, CancellationToken cancellationToken = default)
+        public async Task<StockProductResponse?> GetProductByIdAsync(
+            Guid productId,
+            CancellationToken cancellationToken = default)
         {
-            var response = await _httpClient.PostAsJsonAsync(
-        "api/stock/debit",
-        request,
-        cancellationToken);
+            var requestUri = $"api/products/{productId}";
+
+            _logger.LogInformation(
+                "Calling Stock Service: {BaseAddress}{RequestUri}",
+                _httpClient.BaseAddress,
+                requestUri);
+
+            HttpResponseMessage response;
+
+            try
+            {
+                response = await _httpClient.GetAsync(
+                    requestUri,
+                    cancellationToken);
+            }
+            catch (HttpRequestException exception)
+            {
+                throw new ServiceUnavailableException(
+                    "Stock service is currently unavailable.",
+                    exception);
+            }
+            catch (TimeoutException exception)
+            {
+                throw new ServiceUnavailableException(
+                    "Stock service did not respond within the expected time.",
+                    exception);
+            }
+
+            _logger.LogInformation(
+                "Stock Service returned status code {StatusCode}",
+                response.StatusCode);
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadFromJsonAsync<StockProductResponse>(
+                cancellationToken: cancellationToken);
+        }
+
+        public async Task<DebitStockResponse> DebitStockAsync(
+            DebitStockRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            HttpResponseMessage response;
+
+            try
+            {
+                response = await _httpClient.PostAsJsonAsync(
+                    "api/stock/debit",
+                    request,
+                    cancellationToken);
+            }
+            catch (HttpRequestException exception)
+            {
+                throw new ServiceUnavailableException(
+                    "Stock service is currently unavailable.",
+                    exception);
+            }
+            catch (TimeoutException exception)
+            {
+                throw new ServiceUnavailableException(
+                    "Stock service did not respond within the expected time.",
+                    exception);
+            }
 
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
@@ -55,36 +122,6 @@ namespace Korp.Billing.Api.Infrastructure.Clients.Stock
             return result
                 ?? throw new InvalidOperationException(
                     "Stock service returned an empty response.");
-        }
-
-        public async Task<StockProductResponse?> GetProductByIdAsync(
-            Guid productId,
-            CancellationToken cancellationToken = default)
-        {
-            var requestUri = $"api/products/{productId}";
-
-            _logger.LogInformation(
-                "Calling Stock Service: {BaseAddress}{RequestUri}",
-                _httpClient.BaseAddress,
-                requestUri);
-
-            var response = await _httpClient.GetAsync(
-                requestUri,
-                cancellationToken);
-
-            _logger.LogInformation(
-                "Stock Service returned status code {StatusCode}",
-                response.StatusCode);
-
-            if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                return null;
-            }
-
-            response.EnsureSuccessStatusCode();
-
-            return await response.Content.ReadFromJsonAsync<StockProductResponse>(
-                cancellationToken: cancellationToken);
         }
     }
 }

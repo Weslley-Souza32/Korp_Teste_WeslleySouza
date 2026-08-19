@@ -7,7 +7,7 @@ Content-Type: application/json
 {
   "items": [
     {
-      "productId": "c93e275e-423f-4c41-91c1-eb92b983a9bb",
+      "productId": "28131ad0-3586-44c3-b7bb-99784f31636b",
       "quantity": 999
     }
   ]
@@ -22,4 +22,4 @@ GET {{Korp.Billing.Api_HostAddress}}/api/invoices/566f4638-8945-467e-889e-615874
 Accept: application/json
 
 ### Print Invoice
-POST {{Korp.Billing.Api_HostAddress}}/api/invoices/566f4638-8945-467e-889e-61587418a818/print
+POST {{Korp.Billing.Api_HostAddress}}/api/invoices/4e031220-bef7-4168-9f8b-7989935fad69/print

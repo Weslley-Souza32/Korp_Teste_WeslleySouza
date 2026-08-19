@@ -7,6 +7,7 @@ using Korp.Billing.Api.Features.Invoices.Print;
 using Korp.Billing.Api.Infrastructure.Clients.Stock;
 using Korp.Billing.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Http.Resilience;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,13 +27,28 @@ builder.Services.AddDbContext<BillingDbContext>(option =>
     option.UseNpgsql(
         builder.Configuration.GetConnectionString("BillingDatabase")));
 
-builder.Services.AddHttpClient<IStockServiceClient, StockServiceClient>(httpClient =>
-{
-    var baseUrl = builder.Configuration["Services:Stock:BaseUrl"]
-        ?? throw new InvalidOperationException("Stock service base URL is not configured.");
+builder.Services
+    .AddHttpClient<IStockServiceClient, StockServiceClient>(
+        httpClient =>
+        {
+            var baseUrl = builder.Configuration["Services:Stock:BaseUrl"]
+                ?? throw new InvalidOperationException(
+                    "Stock service base URL is not configured.");
 
-    httpClient.BaseAddress = new Uri(baseUrl);
-});
+            httpClient.BaseAddress = new Uri(baseUrl);
+        })
+    .AddStandardResilienceHandler(options =>
+    {
+        options.Retry.DisableForUnsafeHttpMethods();
+
+        options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(5);
+        options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(10);
+
+        options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(10);
+        options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(10);
+        options.CircuitBreaker.MinimumThroughput = 3;
+        options.CircuitBreaker.FailureRatio = 0.5;
+    });
 
 builder.Services.AddValidatorsFromAssemblyContaining<CreateInvoiceValidator>();
 

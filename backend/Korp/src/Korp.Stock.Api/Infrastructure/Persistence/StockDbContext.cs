@@ -10,6 +10,7 @@ namespace Korp.Stock.Api.Infrastructure.Persistence
         }
 
         public DbSet<Product> Products => Set<Product>();
+        public DbSet<StockDebitOperation> StockDebitOperations => Set<StockDebitOperation>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
