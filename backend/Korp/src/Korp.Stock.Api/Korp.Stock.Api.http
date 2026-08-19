@@ -15,5 +15,5 @@ GET {{Korp.Stock.Api_HostAddress}}/api/products
 Accept: application/json
 
 ### Get Product By Id
-GET {{Korp.Stock.Api_HostAddress}}/api/products/COLE-AQUI-UM-GUID-VALIDO
+GET {{Korp.Stock.Api_HostAddress}}/api/products/"COLE-AQUI-UM-GUID-REAL"
 Accept: application/json

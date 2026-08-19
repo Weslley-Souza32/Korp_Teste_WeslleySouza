@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/Korp.Billing.Api/Korp.Billing.Api.csproj" Id="dc2711c4-c5a5-42b7-94a2-5caf48cb58d1" />
     <Project Path="src/Korp.Stock.Api/Korp.Stock.Api.csproj" />
   </Folder>
   <Folder Name="/tests/">

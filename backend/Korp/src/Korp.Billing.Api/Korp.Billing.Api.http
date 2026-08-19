@@ -1,0 +1,22 @@
+@Korp.Billing.Api_HostAddress = https://localhost:7066
+
+### Create Invoice
+POST {{Korp.Billing.Api_HostAddress}}/api/invoices
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "productId": "COLE-AQUI-UM-GUID-REAL",
+      "quantity": 2
+    }
+  ]
+}
+
+### Get All Invoices
+GET {{Korp.Billing.Api_HostAddress}}/api/invoices
+Accept: application/json
+
+### Get Invoice By Id
+GET {{Korp.Billing.Api_HostAddress}}/api/invoices/27dd0c33-df81-45c0-a997-004e2c50edf1
+Accept: application/json
