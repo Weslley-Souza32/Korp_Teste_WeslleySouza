@@ -1,1 +1,38 @@
-<p>product-list works!</p>
+<section class="page-header">
+  <div>
+    <h1>Produtos</h1>
+    <p>Consulte os produtos disponíveis e seus saldos em estoque.</p>
+  </div>
+
+  <a mat-flat-button routerLink="/products/new"> Novo Produto </a>
+</section>
+
+<table mat-table [dataSource]="products()" class="product-table">
+  <ng-container matColumnDef="code">
+    <th mat-header-cell *matHeaderCellDef>Código</th>
+
+    <td mat-cell *matCellDef="let product">
+      {{ product.code }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="description">
+    <th mat-header-cell *matHeaderCellDef>Descrição</th>
+
+    <td mat-cell *matCellDef="let product">
+      {{ product.description }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="stockQuantity">
+    <th mat-header-cell *matHeaderCellDef>Estoque</th>
+
+    <td mat-cell *matCellDef="let product">
+      {{ product.stockQuantity }}
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+</table>

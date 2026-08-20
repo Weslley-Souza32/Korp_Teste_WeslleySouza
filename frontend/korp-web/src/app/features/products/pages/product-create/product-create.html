@@ -1,1 +1,68 @@
-<p>product-create works!</p>
+<section class="page-header">
+  <div>
+    <h1>Novo Produto</h1>
+    <p>Cadastre um produto e informe seu saldo inicial em estoque.</p>
+  </div>
+</section>
+
+<mat-card class="form-card">
+  <mat-card-content>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="product-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Código</mat-label>
+
+        <input matInput formControlName="code" placeholder="Ex.: PROD-005" />
+
+        @if (form.controls.code.hasError('required')) {
+          <mat-error> O código é obrigatório. </mat-error>
+        }
+
+        @if (form.controls.code.hasError('maxlength')) {
+          <mat-error> O código deve possuir no máximo 50 caracteres. </mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Descrição</mat-label>
+
+        <input
+          matInput
+          formControlName="description"
+          placeholder="Ex.: Monitor Dell 24 polegadas"
+        />
+
+        @if (form.controls.description.hasError('required')) {
+          <mat-error> A descrição é obrigatória. </mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Estoque inicial</mat-label>
+
+        <input matInput type="number" formControlName="stockQuantity" />
+
+        @if (form.controls.stockQuantity.hasError('min')) {
+          <mat-error> O estoque não pode ser negativo. </mat-error>
+        }
+      </mat-form-field>
+
+      @if (errorMessage()) {
+        <div class="error-message">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <div class="actions">
+        <a mat-button routerLink="/products" [class.disabled]="isSubmitting()"> Cancelar </a>
+
+        <button mat-flat-button type="submit" [disabled]="isSubmitting()">
+          @if (isSubmitting()) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            Salvar Produto
+          }
+        </button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
