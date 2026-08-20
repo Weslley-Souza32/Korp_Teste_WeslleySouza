@@ -1,59 +1,39 @@
 ﻿using Korp.Stock.Api.Common.Exceptions;
 using Korp.Stock.Api.Domain.Entities;
 using Korp.Stock.Api.Features.Products.Create;
-using Korp.Stock.Api.Infrastructure.Persistence;
-using Microsoft.Data.Sqlite;
+using Korp.Stock.Tests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace Korp.Stock.Tests.Products.Create
 {
-    public class CreateProductHandlerTests
+    [Collection("StockDatabase")]
+    public class CreateProductHandlerTests : IAsyncLifetime
     {
-        private static async Task<TestDatabase> CreateDatabaseAsync()
+        private readonly StockDatabaseFixture _fixture;
+
+        public CreateProductHandlerTests(
+            StockDatabaseFixture fixture)
         {
-            var connection = new SqliteConnection("DataSource=:memory:");
-
-            await connection.OpenAsync();
-
-            var options = new DbContextOptionsBuilder<StockDbContext>()
-                .UseSqlite(connection)
-                .Options;
-
-            var dbContext = new StockDbContext(options);
-
-            await dbContext.Database.EnsureCreatedAsync();
-
-            return new TestDatabase(connection, dbContext);
+            _fixture = fixture;
         }
 
-        private sealed class TestDatabase : IAsyncDisposable
+        public async Task InitializeAsync()
         {
-            public SqliteConnection Connection { get; }
+            await _fixture.ResetDatabaseAsync();
+        }
 
-            public StockDbContext DbContext { get; }
-
-            public TestDatabase(
-                SqliteConnection connection,
-                StockDbContext dbContext)
-            {
-                Connection = connection;
-                DbContext = dbContext;
-            }
-
-            public async ValueTask DisposeAsync()
-            {
-                await DbContext.DisposeAsync();
-                await Connection.DisposeAsync();
-            }
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
         }
 
         [Fact]
         public async Task HandleAsync_WhenRequestIsValid_ShouldCreateProduct()
         {
             // Arrange
-            await using var database = await CreateDatabaseAsync();
+            await using var dbContext = _fixture.CreateDbContext();
 
-            var handler = new CreateProductHandler(database.DbContext);
+            var handler = new CreateProductHandler(dbContext);
 
             var request = new CreateProductRequest
             {
@@ -71,7 +51,7 @@ namespace Korp.Stock.Tests.Products.Create
             Assert.Equal(request.Description, response.Description);
             Assert.Equal(request.StockQuantity, response.StockQuantity);
 
-            var product = await database.DbContext.Products
+            var product = await dbContext.Products
                 .AsNoTracking()
                 .SingleAsync();
 
@@ -85,7 +65,7 @@ namespace Korp.Stock.Tests.Products.Create
         public async Task HandleAsync_WhenCodeAlreadyExists_ShouldThrowConflictException()
         {
             // Arrange
-            await using var database = await CreateDatabaseAsync();
+            await using var dbContext = _fixture.CreateDbContext();
 
             var existingProduct = new Product
             {
@@ -97,11 +77,11 @@ namespace Korp.Stock.Tests.Products.Create
                 UpdatedAt = DateTimeOffset.UtcNow
             };
 
-            database.DbContext.Products.Add(existingProduct);
+            dbContext.Products.Add(existingProduct);
 
-            await database.DbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
 
-            var handler = new CreateProductHandler(database.DbContext);
+            var handler = new CreateProductHandler(dbContext);
 
             var request = new CreateProductRequest
             {
@@ -117,7 +97,7 @@ namespace Korp.Stock.Tests.Products.Create
             // Assert
             Assert.Contains("PROD-001", exception.Message);
 
-            var productCount = await database.DbContext.Products.CountAsync();
+            var productCount = await dbContext.Products.CountAsync();
 
             Assert.Equal(1, productCount);
         }

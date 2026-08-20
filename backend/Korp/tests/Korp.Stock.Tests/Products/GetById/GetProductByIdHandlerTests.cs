@@ -2,55 +2,38 @@
 using Korp.Stock.Api.Domain.Entities;
 using Korp.Stock.Api.Features.Products.GetById;
 using Korp.Stock.Api.Infrastructure.Persistence;
+using Korp.Stock.Tests.Infrastructure;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 namespace Korp.Stock.Tests.Products.GetById
 {
-    public class GetProductByIdHandlerTests
+    [Collection("StockDatabase")]
+    public class GetProductByIdHandlerTests : IAsyncLifetime
     {
-        private static async Task<TestDatabase> CreateDatabaseAsync()
+        private readonly StockDatabaseFixture _fixture;
+
+        public GetProductByIdHandlerTests(
+            StockDatabaseFixture fixture)
         {
-            var connection = new SqliteConnection("DataSource=:memory:");
-
-            await connection.OpenAsync();
-
-            var options = new DbContextOptionsBuilder<StockDbContext>()
-                .UseSqlite(connection)
-                .Options;
-
-            var dbContext = new StockDbContext(options);
-
-            await dbContext.Database.EnsureCreatedAsync();
-
-            return new TestDatabase(connection, dbContext);
+            _fixture = fixture;
         }
 
-        private sealed class TestDatabase : IAsyncDisposable
+        public async Task InitializeAsync()
         {
-            public SqliteConnection Connection { get; }
-            public StockDbContext DbContext { get; }
+            await _fixture.ResetDatabaseAsync();
+        }
 
-            public TestDatabase(
-                SqliteConnection connection,
-                StockDbContext dbContext)
-            {
-                Connection = connection;
-                DbContext = dbContext;
-            }
-
-            public async ValueTask DisposeAsync()
-            {
-                await DbContext.DisposeAsync();
-                await Connection.DisposeAsync();
-            }
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
         }
 
         [Fact]
         public async Task HandleAsync_WhenProductExists_ShouldReturnProduct()
         {
             // Arrange
-            await using var database = await CreateDatabaseAsync();
+            await using var dbContext = _fixture.CreateDbContext();
 
             var product = new Product
             {
@@ -62,11 +45,11 @@ namespace Korp.Stock.Tests.Products.GetById
                 UpdatedAt = DateTimeOffset.UtcNow
             };
 
-            database.DbContext.Products.Add(product);
+            dbContext.Products.Add(product);
 
-            await database.DbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
 
-            var handler = new GetProductByIdHandler(database.DbContext);
+            var handler = new GetProductByIdHandler(dbContext);
 
             // Act
             var response = await handler.HandleAsync(product.Id);
@@ -82,9 +65,9 @@ namespace Korp.Stock.Tests.Products.GetById
         public async Task HandleAsync_WhenProductDoesNotExist_ShouldThrowNotFoundException()
         {
             // Arrange
-            await using var database = await CreateDatabaseAsync();
+            await using var dbContext = _fixture.CreateDbContext();
 
-            var handler = new GetProductByIdHandler(database.DbContext);
+            var handler = new GetProductByIdHandler(dbContext);
 
             var productId = Guid.NewGuid();
 
