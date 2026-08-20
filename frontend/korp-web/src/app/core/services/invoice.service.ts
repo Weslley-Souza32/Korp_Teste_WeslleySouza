@@ -2,7 +2,13 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { CreateInvoiceRequest, Invoice, PrintInvoiceResponse } from '../models/invoice.model';
+import {
+  CreateInvoiceRequest,
+  Invoice,
+  InvoiceSummary,
+  PrintInvoiceResponse,
+} from '../models/invoice.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -10,10 +16,10 @@ import { CreateInvoiceRequest, Invoice, PrintInvoiceResponse } from '../models/i
 export class InvoiceService {
   private readonly http = inject(HttpClient);
 
-  private readonly baseUrl = 'https://localhost:7066/api/invoices';
+  private readonly baseUrl = `${environment.api.billing}/invoices`;
 
-  getAll(): Observable<Invoice[]> {
-    return this.http.get<Invoice[]>(this.baseUrl);
+  getAll(): Observable<InvoiceSummary[]> {
+    return this.http.get<InvoiceSummary[]>(this.baseUrl);
   }
 
   getById(id: string): Observable<Invoice> {

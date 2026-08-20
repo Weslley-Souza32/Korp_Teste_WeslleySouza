@@ -1,3 +1,13 @@
+export type InvoiceStatus = 'Open' | 'Closed';
+
+export interface InvoiceSummary {
+  id: string;
+  number: number;
+  status: InvoiceStatus;
+  createdAt: string;
+  closedAt: string | null;
+}
+
 export interface InvoiceItem {
   productId: string;
   productCode: string;
@@ -5,12 +15,7 @@ export interface InvoiceItem {
   quantity: number;
 }
 
-export interface Invoice {
-  id: string;
-  number: number;
-  status: 'Open' | 'Closed';
-  createdAt: string;
-  closedAt: string | null;
+export interface Invoice extends InvoiceSummary {
   items: InvoiceItem[];
 }
 
@@ -26,6 +31,6 @@ export interface CreateInvoiceRequest {
 export interface PrintInvoiceResponse {
   id: string;
   number: number;
-  status: 'Open' | 'Closed';
+  status: InvoiceStatus;
   closedAt: string | null;
 }

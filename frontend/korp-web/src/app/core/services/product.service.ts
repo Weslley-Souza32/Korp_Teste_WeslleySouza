@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Product } from '../models/product.model';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface CreateProductRequest {
   code: string;
@@ -15,7 +16,7 @@ export interface CreateProductRequest {
 export class ProductService {
   private readonly http = inject(HttpClient);
 
-  private readonly baseUrl = 'https://localhost:7200/api/products';
+  private readonly baseUrl = `${environment.api.stock}/products`;
 
   getAll(): Observable<Product[]> {
     return this.http.get<Product[]>(this.baseUrl);

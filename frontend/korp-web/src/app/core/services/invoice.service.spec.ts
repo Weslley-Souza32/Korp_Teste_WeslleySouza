@@ -3,7 +3,12 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { InvoiceService } from './invoice.service';
-import { CreateInvoiceRequest, Invoice, PrintInvoiceResponse } from '../models/invoice.model';
+import {
+  CreateInvoiceRequest,
+  Invoice,
+  InvoiceSummary,
+  PrintInvoiceResponse,
+} from '../models/invoice.model';
 
 describe('InvoiceService', () => {
   let service: InvoiceService;
@@ -23,14 +28,13 @@ describe('InvoiceService', () => {
   });
 
   it('should get all invoices', () => {
-    const mockInvoices: Invoice[] = [
+    const mockInvoices: InvoiceSummary[] = [
       {
         id: '11111111-1111-1111-1111-111111111111',
         number: 1,
         status: 'Open',
         createdAt: '2026-08-20T12:00:00Z',
         closedAt: null,
-        items: [],
       },
     ];
 

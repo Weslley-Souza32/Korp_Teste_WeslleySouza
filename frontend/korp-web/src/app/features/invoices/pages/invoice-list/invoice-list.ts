@@ -6,7 +6,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTableModule } from '@angular/material/table';
 import { DatePipe } from '@angular/common';
 
-import { Invoice } from '../../../../core/models/invoice.model';
+import { InvoiceSummary } from '../../../../core/models/invoice.model';
 import { InvoiceService } from '../../../../core/services/invoice.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
@@ -26,7 +26,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 export class InvoiceList implements OnInit {
   private readonly invoiceService = inject(InvoiceService);
 
-  invoices = signal<Invoice[]>([]);
+  invoices = signal<InvoiceSummary[]>([]);
   isLoading = signal(true);
   errorMessage = signal<string | null>(null);
 

@@ -101,7 +101,7 @@ export class InvoiceDetails implements OnInit {
 
         if (error.status === 409) {
           this.printErrorMessage.set(
-            error?.error?.detail ?? 'Não foi possível imprimir a nota fiscal.',
+            'Não há estoque suficiente para concluir a impressão desta nota fiscal.',
           );
         } else if (error.status === 503) {
           this.printErrorMessage.set(

@@ -56,7 +56,11 @@ export class ProductCreate {
       error: (error) => {
         console.error('Error creating product:', error);
 
-        this.errorMessage.set(error?.error?.detail ?? 'Não foi possível cadastrar o produto.');
+        if (error.status === 409) {
+          this.errorMessage.set('Já existe um produto cadastrado com este código.');
+        } else {
+          this.errorMessage.set(error?.error?.detail ?? 'Não foi possível cadastrar o produto.');
+        }
 
         this.isSubmitting.set(false);
       },

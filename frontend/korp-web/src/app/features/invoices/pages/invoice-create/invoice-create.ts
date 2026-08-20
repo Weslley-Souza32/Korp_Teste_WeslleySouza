@@ -83,7 +83,16 @@ export class InvoiceCreate implements OnInit {
         const validationErrors = error?.error?.errors;
 
         if (validationErrors) {
-          const messages = Object.values(validationErrors).flat().join(' ');
+          const messages = Object.values(validationErrors)
+            .flat()
+            .map((message) => {
+              if (message === 'The invoice cannot contain duplicate products.') {
+                return 'A nota fiscal não pode conter produtos duplicados.';
+              }
+
+              return message;
+            })
+            .join(' ');
 
           this.errorMessage.set(messages);
         } else {
