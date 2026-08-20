@@ -27,3 +27,27 @@
 .active-link {
   background-color: rgba(0, 0, 0, 0.06);
 }
+
+@media (max-width: 900px) {
+  .app-sidenav {
+    width: 200px;
+  }
+
+  .app-content {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 700px) {
+  .app-sidenav {
+    width: 180px;
+  }
+
+  .brand {
+    font-size: 18px;
+  }
+
+  .app-content {
+    padding: 12px;
+  }
+}

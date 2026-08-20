@@ -33,6 +33,7 @@ export class InvoiceDetails implements OnInit {
   isLoading = signal(true);
   isPrinting = signal(false);
   printErrorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
   errorMessage = signal<string | null>(null);
 
   displayedColumns: string[] = ['code', 'description', 'quantity'];
@@ -74,6 +75,7 @@ export class InvoiceDetails implements OnInit {
 
     this.isPrinting.set(true);
     this.printErrorMessage.set(null);
+    this.successMessage.set(null);
 
     this.invoiceService.print(currentInvoice.id).subscribe({
       next: (response) => {
@@ -88,6 +90,8 @@ export class InvoiceDetails implements OnInit {
             closedAt: response.closedAt,
           };
         });
+
+        this.successMessage.set('Nota fiscal impressa e fechada com sucesso.');
 
         this.isPrinting.set(false);
       },

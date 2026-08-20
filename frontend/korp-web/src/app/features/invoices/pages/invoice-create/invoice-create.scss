@@ -33,3 +33,18 @@
   background: rgba(244, 67, 54, 0.08);
   color: #b3261e;
 }
+
+@media (max-width: 700px) {
+  .invoice-item {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+  }
+
+  .actions a,
+  .actions button {
+    width: 100%;
+  }
+}

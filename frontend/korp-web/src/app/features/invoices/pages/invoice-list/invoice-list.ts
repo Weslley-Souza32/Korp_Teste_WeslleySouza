@@ -8,10 +8,18 @@ import { DatePipe } from '@angular/common';
 
 import { Invoice } from '../../../../core/models/invoice.model';
 import { InvoiceService } from '../../../../core/services/invoice.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-invoice-list',
-  imports: [RouterLink, MatButtonModule, MatChipsModule, MatTableModule, DatePipe],
+  imports: [
+    RouterLink,
+    MatButtonModule,
+    MatChipsModule,
+    MatTableModule,
+    DatePipe,
+    MatProgressSpinnerModule,
+  ],
   templateUrl: './invoice-list.html',
   styleUrl: './invoice-list.scss',
 })
@@ -19,6 +27,8 @@ export class InvoiceList implements OnInit {
   private readonly invoiceService = inject(InvoiceService);
 
   invoices = signal<Invoice[]>([]);
+  isLoading = signal(true);
+  errorMessage = signal<string | null>(null);
 
   displayedColumns: string[] = ['number', 'status', 'createdAt', 'closedAt', 'actions'];
 
@@ -27,12 +37,20 @@ export class InvoiceList implements OnInit {
   }
 
   private loadInvoices(): void {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
     this.invoiceService.getAll().subscribe({
       next: (invoices) => {
         this.invoices.set(invoices);
+        this.isLoading.set(false);
       },
       error: (error) => {
         console.error('Error loading invoices:', error);
+
+        this.errorMessage.set('Não foi possível carregar as notas fiscais.');
+
+        this.isLoading.set(false);
       },
     });
   }
